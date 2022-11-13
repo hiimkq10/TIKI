@@ -386,15 +386,15 @@ public class OrderController {
 
         for (CartItemEntity item : cart.getCartItem()) {
             DiscountProgramEntity discountProgram = discountProgramService.findByIdAndProductBrand(request.getDiscountId(), item.getProduct().getProductBrand());
-            if(request.getDiscountId()==null){
-                totalOrderProduct += item.getProduct().getPrice() * item.getQuantity();
-                item.getProduct().setInventory(item.getProduct().getInventory()-item.getQuantity());
-                item.getProduct().setSellAmount(item.getQuantity()+ item.getProduct().getSellAmount());
-            }else if (discountProgram != null && discountProgram.getFromDate().compareTo(today) < 0 && discountProgram.getToDate().compareTo(today) > 0) {
+            if (discountProgram != null && discountProgram.getFromDate().compareTo(today) < 0 && discountProgram.getToDate().compareTo(today) > 0) {
                 double discount = item.getProduct().getPrice() * discountProgram.getPercent() / 100;
                 totalOrderProduct += (item.getProduct().getPrice() - discount) * item.getQuantity();
                 item.getProduct().setInventory(item.getProduct().getInventory() - item.getQuantity());
                 item.getProduct().setSellAmount(item.getQuantity() + item.getProduct().getSellAmount());
+            } else {
+                totalOrderProduct += item.getProduct().getPrice() * item.getQuantity();
+                item.getProduct().setInventory(item.getProduct().getInventory()-item.getQuantity());
+                item.getProduct().setSellAmount(item.getQuantity()+ item.getProduct().getSellAmount());
             }
         }
         return totalOrderProduct;

@@ -3,7 +3,7 @@ package com.hcmute.starter.common;
 public enum OrderStatus {
   AWAITINGPAYMENT(1, "Chờ thanh toán"),
   PROGRESSING(2, "Đang xử lý"),
-  DELIVERING(3, "Đang giao hàng"),
+  DELIVERING(3, "Đang vận chuyển"),
   DELIVERED(4, "Đã giao"),
   CANCELED(5, "Đã hủy");
 
