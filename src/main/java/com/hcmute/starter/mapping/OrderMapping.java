@@ -1,6 +1,7 @@
 package com.hcmute.starter.mapping;
 
 
+import com.hcmute.starter.common.OrderStatus;
 import com.hcmute.starter.model.entity.*;
 import com.hcmute.starter.model.entity.userAddress.AddressEntity;
 import com.hcmute.starter.model.payload.request.Order.AddOrderRequest;
@@ -34,7 +35,7 @@ public class OrderMapping {
         order.setPaymentOrder(payment);
         order.setShipOrder(ship);
         order.setCreatedDate(LocalDateTime.now());
-        order.setDelStatus(0);
+        order.setDelStatus(OrderStatus.AWAITINGPAYMENT);
         order.setExpectedDate(LocalDate.from(order.getCreatedDate().plusDays(2)));
         return order;
     }

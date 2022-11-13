@@ -1,5 +1,6 @@
 package com.hcmute.starter.model.entity;
 
+import com.hcmute.starter.common.OrderStatus;
 import com.hcmute.starter.model.entity.userAddress.AddressEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,7 +51,8 @@ public class OrderEntity {
     private double total;
 
     @Column(name = "\"del_status\"")
-    private int delStatus;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus delStatus;
 
     @Column(name = "\"expected_date\"")
     private LocalDate expectedDate;
@@ -128,11 +130,11 @@ public class OrderEntity {
         this.total = total;
     }
 
-    public int getDelStatus() {
+    public OrderStatus getDelStatus() {
         return delStatus;
     }
 
-    public void setDelStatus(int delStatus) {
+    public void setDelStatus(OrderStatus delStatus) {
         this.delStatus = delStatus;
     }
 
