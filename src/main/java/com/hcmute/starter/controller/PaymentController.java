@@ -8,6 +8,9 @@ import com.hcmute.starter.model.payload.SuccessResponse;
 import com.hcmute.starter.model.payload.request.Notification.AddNotificationRequest;
 import com.hcmute.starter.model.payload.request.Payment.AddPaymentRequest;
 import com.hcmute.starter.service.PaymentService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +37,6 @@ public class PaymentController {
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("successful");
         response.setSuccess(true);
-//        for(PaymentEntity payment : list){
-//            response.getData().put("Payment "+ payment.getPaymentId(),payment.getPaymentName());
-//        }
         response.getData().put("listPayment",list);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

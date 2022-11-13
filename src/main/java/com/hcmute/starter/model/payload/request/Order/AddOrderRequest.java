@@ -1,5 +1,11 @@
 package com.hcmute.starter.model.payload.request.Order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hcmute.starter.model.payload.request.CartRequest.AddItemCartRequest;
+import java.util.Set;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -19,7 +25,9 @@ public class AddOrderRequest {
     private int idPayment;
     @NotBlank(message = "Nhập id loại vận chuyển")
     private int idShip;
-    private int[] cartItem;
+    @JsonProperty("products")
+    @NotEmpty(message = "Cart cant be empty")
+    private Set<AddItemCartRequest> setOfCartItems;
     private UUID voucher;
     private Long DiscountId;
 }
