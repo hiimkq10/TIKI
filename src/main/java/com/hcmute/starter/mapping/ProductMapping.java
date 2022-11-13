@@ -1,15 +1,17 @@
 package com.hcmute.starter.mapping;
 
 import com.hcmute.starter.model.entity.*;
+import com.hcmute.starter.model.payload.SuccessResponse;
 import com.hcmute.starter.model.payload.request.AddNewProductRequest;
 import com.hcmute.starter.model.payload.request.ProductRequest.ProductFromJson;
 import com.hcmute.starter.model.payload.response.ProductResponse;
 import com.hcmute.starter.repository.ImageProductRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ProductMapping {
     public static ProductEntity addProductToEntity(AddNewProductRequest addNewProductRequest, CategoryEntity category, BrandEntity brand){
@@ -32,6 +34,7 @@ public class ProductMapping {
             listImageProduct.add(img);
             img.setProduct(product);
         }
+
         product.setImageProductEntityList(listImageProduct);
         product.setAttributeOptionEntities(listAttributeOption);
         return product;

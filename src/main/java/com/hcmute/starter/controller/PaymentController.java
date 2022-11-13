@@ -34,9 +34,10 @@ public class PaymentController {
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("successful");
         response.setSuccess(true);
-        for(PaymentEntity payment : list){
-            response.getData().put("Payment "+ payment.getPaymentId(),payment.getPaymentName());
-        }
+//        for(PaymentEntity payment : list){
+//            response.getData().put("Payment "+ payment.getPaymentId(),payment.getPaymentName());
+//        }
+        response.getData().put("listPayment",list);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

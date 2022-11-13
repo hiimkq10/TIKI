@@ -34,9 +34,10 @@ public class ShipController {
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("successful");
         response.setSuccess(true);
-        for(ShipEntity ship : list){
-            response.getData().put("Ship Type "+ ship.getShipId(),ship.toString());
-        }
+//        for(ShipEntity ship : list){
+//            response.getData().put("Ship Type "+ ship.getShipId(),ship.toString());
+//        }
+        response.getData().put("listShip",list);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
