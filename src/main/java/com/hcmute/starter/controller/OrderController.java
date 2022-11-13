@@ -3,11 +3,13 @@ package com.hcmute.starter.controller;
 
 import com.hcmute.starter.handler.HttpMessageNotReadableException;
 import com.hcmute.starter.handler.MethodArgumentNotValidException;
+import com.hcmute.starter.handler.RecordNotFoundException;
 import com.hcmute.starter.mapping.OrderMapping;
 import com.hcmute.starter.mapping.UserNotificationMapping;
 import com.hcmute.starter.model.entity.*;
 import com.hcmute.starter.model.entity.userAddress.AddressEntity;
 import com.hcmute.starter.model.payload.SuccessResponse;
+import com.hcmute.starter.model.payload.request.CartRequest.AddItemCartRequest;
 import com.hcmute.starter.model.payload.request.Notification.AddNotificationRequest;
 import com.hcmute.starter.model.payload.request.Order.AddOrderRequest;
 import com.hcmute.starter.model.payload.response.ErrorResponseMap;
@@ -16,6 +18,7 @@ import com.hcmute.starter.service.*;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +50,7 @@ public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
     private final CartService cartService;
-
+    private final ProductService productService;
     private final PaypalService paypalService;
 
     private final VoucherService voucherService;
@@ -91,15 +94,19 @@ public class OrderController {
 //                DiscountProgramEntity discountProgram = discountProgramService.findByDiscountId(request.getId());
 
                 order.setUserOrder(user);
-                CartEntity cart = cartService.getCartByUid(user);
 
-               if (request.getCartItem().length==0)
+//                CartEntity cart = cartService.getCartByUid(user);
+               CartEntity cart = new CartEntity(0.0, false, user);
+               cart = cartService.saveCart(cart);
+               cart.setCartItem(new ArrayList<>());
+
+               if (request.getSetOfCartItems().size()==0)
                {
                    response.setStatus(HttpStatus.NO_CONTENT.value());
                    response.setSuccess(false);
                    response.setMessage("Vui lòng chọn hàng để thanh toán");
                }else{
-                   processCartItem(request,cart,user);
+                   myProcessCartItem(request,cart,user);
                }
                 order.setCartOrder(cart);
                 List<AddressEntity> list = user.getAddress();
@@ -277,29 +284,55 @@ public class OrderController {
     }
 
     private void processCartItem(AddOrderRequest request, CartEntity cart, UserEntity user){
-        List<CartItemEntity> listPick = new ArrayList<CartItemEntity>();
-        List<CartItemEntity> listLeft = new ArrayList<CartItemEntity>();
-
-
-        for (int i : request.getCartItem())
-        {
-            CartItemEntity cartItem =cartService.getItemByIdAndCart(i,cart);
-            listPick.add(cartItem);
-            cart.getCartItem().remove(cartItem);
-        }
-
-        listLeft = cart.getCartItem();
-        cart.setCartItem(listPick);
-        cart.setStatus(false);
-        CartEntity newCart = new CartEntity(0.0,true,user);
-        newCart.setCartItem(listLeft);
-        for(CartItemEntity cartItem : listLeft)
-        {
-            cartItem.setCart(newCart);
-//            cartService.saveCartItem(cartItem);
-        }
-        cartService.saveCart(newCart);
+//        List<CartItemEntity> listPick = new ArrayList<CartItemEntity>();
+//        List<CartItemEntity> listLeft = new ArrayList<CartItemEntity>();
+//
+//
+//        for (int i : request.getCartItem())
+//        {
+//            CartItemEntity cartItem =cartService.getItemByIdAndCart(i,cart);
+//            listPick.add(cartItem);
+//            cart.getCartItem().remove(cartItem);
+//        }
+//
+//        listLeft = cart.getCartItem();
+//        cart.setCartItem(listPick);
+//        cart.setStatus(false);
+//        CartEntity newCart = new CartEntity(0.0,true,user);
+//        newCart.setCartItem(listLeft);
+//        for(CartItemEntity cartItem : listLeft)
+//        {
+//            cartItem.setCart(newCart);
+////            cartService.saveCartItem(cartItem);
+//        }
+//        cartService.saveCart(newCart);
     }
+
+    private void myProcessCartItem(AddOrderRequest request, CartEntity cart, UserEntity user){
+        List<CartItemEntity> listOfCartItems = new ArrayList<>();
+        List<ProductEntity> listOfProducts = new ArrayList<>();
+        Map<UUID, Integer> productQuantity = new HashMap<>();
+        ProductEntity product = null;
+        for (AddItemCartRequest item : request.getSetOfCartItems()) {
+            product = productService.findById(UUID.fromString(item.getProductId()));
+            if (product == null) {
+                throw new RuntimeException("Can't find product with id provided");
+            }
+            if (item.getQuantity() != 0 && product.getInventory() < item.getQuantity()) {
+                throw new RuntimeException("Invalid amount");
+            }
+            listOfProducts.add(product);
+            productQuantity.put(product.getId(), item.getQuantity());
+        }
+
+        for (ProductEntity productEntity : listOfProducts)
+        {
+            CartItemEntity cartItem = new CartItemEntity(cart, productEntity, productQuantity.get(productEntity.getId()));
+            cartItem = cartService.saveCartItem(cartItem);
+            cart.getCartItem().add(cartItem);
+        }
+    }
+
     private String paypalPayment(OrderEntity order)
     {
         try {
