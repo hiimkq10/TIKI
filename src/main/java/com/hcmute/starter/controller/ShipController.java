@@ -8,6 +8,9 @@ import com.hcmute.starter.model.payload.SuccessResponse;
 import com.hcmute.starter.model.payload.request.Payment.AddPaymentRequest;
 import com.hcmute.starter.model.payload.request.Ship.AddShipRequest;
 import com.hcmute.starter.service.ShipService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +37,18 @@ public class ShipController {
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("successful");
         response.setSuccess(true);
-        for(ShipEntity ship : list){
-            response.getData().put("Ship Type "+ ship.getShipId(),ship.toString());
-        }
+
+//        for(ShipEntity ship : list){
+//            response.getData().put("Ship Type "+ ship.getShipId(),ship.toString());
+//        }
+
+        response.getData().put("ShipList", list
+            .stream()
+            .map(ship -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("Ship Type "+ ship.getShipId(),ship.toString());
+                return map;
+            }).collect(Collectors.toList()));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
