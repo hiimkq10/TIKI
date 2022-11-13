@@ -37,18 +37,7 @@ public class PaymentController {
         response.setStatus(HttpStatus.OK.value());
         response.setMessage("successful");
         response.setSuccess(true);
-
-//        for(PaymentEntity payment : list){
-//            response.getData().put("Payment "+ payment.getPaymentId(),payment.getPaymentName());
-//        }
-
-        response.getData().put("PaymentList", list
-            .stream()
-            .map(payment -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("Payment "+ payment.getPaymentId(),payment.getPaymentName());
-                return map;
-            }).collect(Collectors.toList()));
+        response.getData().put("listPayment",list);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
