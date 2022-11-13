@@ -1,6 +1,7 @@
 package com.hcmute.starter.controller;
 
 
+import com.hcmute.starter.common.OrderStatus;
 import com.hcmute.starter.handler.HttpMessageNotReadableException;
 import com.hcmute.starter.handler.MethodArgumentNotValidException;
 import com.hcmute.starter.handler.RecordNotFoundException;
@@ -132,7 +133,7 @@ public class OrderController {
                             {
                                 response.setStatus(HttpStatus.CONFLICT.value());
                                 response.setSuccess(false);
-                                response.setMessage("Product out of iventory");
+                                response.setMessage("Product out of inventory");
                                 response.getData().put("Message",e.getMessage());
                                 return new ResponseEntity<>(response,HttpStatus.CONFLICT);
 
@@ -247,6 +248,35 @@ public class OrderController {
         response.setMessage("Thanh toán thất bại (cancel)");
         return new ResponseEntity<>(response,HttpStatus.FAILED_DEPENDENCY);
     }
+
+    // Chang Order Status
+    @PostMapping("/update-status/{id}")
+    public ResponseEntity<SuccessResponse> changeOrderStatus(@PathVariable("id") int id, @RequestBody int statusId) {
+        OrderStatus orderStatus = OrderStatus.getOrderStatusById(statusId);
+        SuccessResponse response = new SuccessResponse();
+        if (orderStatus != null) {
+            OrderEntity order = orderService.findById(id);
+            if (order == null) {
+                response.setSuccess(false);
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.setMessage("Order is not found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+            order.setDelStatus(orderStatus);
+            order = orderService.save(order);
+
+            response.setSuccess(true);
+            response.setStatus(HttpStatus.OK.value());
+            response.setMessage("Order status is updated");
+//            response.getData().put("Order", order);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.setSuccess(false);
+        response.setStatus(HttpStatus.NOT_FOUND.value());
+        response.setMessage("Order status id is not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     private ResponseEntity SendErrorValid(String field, String message,String title){
         ErrorResponseMap errorResponseMap = new ErrorResponseMap();
         Map<String,String> temp =new HashMap<>();
@@ -309,7 +339,6 @@ public class OrderController {
     }
 
     private void myProcessCartItem(AddOrderRequest request, CartEntity cart, UserEntity user){
-        List<CartItemEntity> listOfCartItems = new ArrayList<>();
         List<ProductEntity> listOfProducts = new ArrayList<>();
         Map<UUID, Integer> productQuantity = new HashMap<>();
         ProductEntity product = null;
