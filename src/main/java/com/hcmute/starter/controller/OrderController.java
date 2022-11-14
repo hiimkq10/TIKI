@@ -222,6 +222,48 @@ public class OrderController {
             throw new BadCredentialsException("access token is missing!!!");
         }
     }
+
+
+    @GetMapping("{id}")
+    public ResponseEntity<SuccessResponse> getOrderById(@PathVariable("id") int id,HttpServletRequest httpServletRequest) throws Exception {
+        String authorizationHeader = httpServletRequest.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String accessToken = authorizationHeader.substring("Bearer ".length());
+            if (jwtUtils.validateExpiredToken(accessToken) == true) {
+                throw new BadCredentialsException("access token is  expired");
+            }
+            try {
+                UserEntity user = userService.findById(UUID.fromString(jwtUtils.getUserNameFromJwtToken(accessToken)));
+                if (user == null) {
+                    return SendErrorValid("User", "Người dùng không hợp lệ", "Lỗi!!!!!");
+                }
+//                List<OrderEntity> listOrder = user.getOrder();
+//                if(listOrder.isEmpty()){
+//                    return SendErrorValid("Order", "Người dùng chưa có đơn hàng", "Thông báo");
+//                }
+//
+//                // Map order -> orderResponse
+//                List<OrderResponse> listOrderResponse = listOrder.stream()
+//                        .map(orderMapping::OrderToOrderResponse).collect(Collectors.toList());
+
+                OrderEntity order = orderService.findById(id);
+
+                SuccessResponse response = new SuccessResponse();
+                response.setStatus(HttpStatus.OK.value());
+                response.setMessage("Thông tin đơn hàng");
+                response.setSuccess(true);
+//                response.getData().put("orderList", listOrder);
+                response.getData().put("orderById", order);
+                return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
+            }catch (Exception e){
+                throw new Exception(e.getMessage() + "\n Get Order Fail");
+            }
+        }
+        else
+        {
+            throw new BadCredentialsException("access token is missing!!!");
+        }
+    }
     @GetMapping("/pay/success/{id}")
     @ResponseBody
     public ResponseEntity<SuccessResponse> paypalSuccess(@PathVariable("id") int id,@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId)
