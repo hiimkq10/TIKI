@@ -28,6 +28,7 @@ public class AddOrderRequest {
     @JsonProperty("products")
     @NotEmpty(message = "Cart cant be empty")
     private Set<AddItemCartRequest> setOfCartItems;
-    private UUID voucher;
+//    private UUID voucher;
+    private double total;
     private Long DiscountId;
 }

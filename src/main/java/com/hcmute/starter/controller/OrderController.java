@@ -116,12 +116,14 @@ public class OrderController {
                 for (AddressEntity address1 : list) {
                     if (order.getAddressOrder().getId() == address1.getId()) {
 
-                        VoucherEntity voucher = voucherService.findById(request.getVoucher());
+//                        VoucherEntity voucher = voucherService.findById(request.getVoucher());
 
-                        double totalOrder = PayMoney(cart,order.getShipOrder(),voucher,request);
+//                        double totalOrder = PayMoney(cart,order.getShipOrder(),voucher,request);
 
-                        cart.setTotal(totalOrder-order.getShipOrder().getShipPrice());
-                        order.setTotal(totalOrder);
+//                        cart.setTotal(totalOrder-order.getShipOrder().getShipPrice());
+//                        order.setTotal(totalOrder);
+                        cart.setTotal(request.getTotal());
+                        order.setTotal(request.getTotal());
                         if (order.getPaymentOrder().getPaymentName().equals("paypal"))
                         {
                             try {
