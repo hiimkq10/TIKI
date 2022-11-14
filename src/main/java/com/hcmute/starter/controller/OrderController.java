@@ -14,6 +14,7 @@ import com.hcmute.starter.model.payload.request.CartRequest.AddItemCartRequest;
 import com.hcmute.starter.model.payload.request.Notification.AddNotificationRequest;
 import com.hcmute.starter.model.payload.request.Order.AddOrderRequest;
 import com.hcmute.starter.model.payload.response.ErrorResponseMap;
+import com.hcmute.starter.model.payload.response.Order.OrderResponse;
 import com.hcmute.starter.security.JWT.JwtUtils;
 import com.hcmute.starter.service.*;
 import com.paypal.api.payments.Links;
@@ -198,11 +199,17 @@ public class OrderController {
                 if(listOrder.isEmpty()){
                     return SendErrorValid("Order", "Người dùng chưa có đơn hàng", "Thông báo");
                 }
+
+                // Map order -> orderResponse
+                List<OrderResponse> listOrderResponse = listOrder.stream()
+                    .map(orderMapping::OrderToOrderResponse).collect(Collectors.toList());
+
                 SuccessResponse response = new SuccessResponse();
                 response.setStatus(HttpStatus.OK.value());
                 response.setMessage("Thông tin đơn hàng");
                 response.setSuccess(true);
-                response.getData().put("orderList", listOrder);
+//                response.getData().put("orderList", listOrder);
+                response.getData().put("orderList", listOrderResponse);
                 return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
             }catch (Exception e){
                 throw new Exception(e.getMessage() + "\n Get Order Fail");
