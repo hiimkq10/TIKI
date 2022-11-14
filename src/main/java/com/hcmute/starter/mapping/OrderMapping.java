@@ -50,8 +50,7 @@ public class OrderMapping {
 
     OrderResponse orderResponse = new OrderResponse();
     orderResponse.setOrderId(order.getOrderId());
-    orderResponse.setOrderStatusDTO(
-        new OrderStatusDTO(orderResponse.getDelStatus().getId(), orderResponse.getDelStatus().getName()));
+    orderResponse.setOrderStatusDTO(new OrderStatusDTO(order.getDelStatus().getId(), order.getDelStatus().getName()));
     orderResponse.setUserOrder(order.getUserOrder());
     orderResponse.setCartOrder(order.getCartOrder());
     orderResponse.setName(order.getName());
