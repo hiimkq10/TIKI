@@ -125,9 +125,10 @@ public class UserNotificationController {
                 response.setMessage("User Notification");
                 response.setSuccess(true);
                 response.setStatus(HttpStatus.OK.value());
-                for (UserNotificationEntity notification : userListNotification) {
-                    response.getData().put("Notification " + notification.getNotificationId(), notification.toString());
-                }
+//                for (UserNotificationEntity notification : userListNotification) {
+//                    response.getData().put("Notification " + notification.getNotificationId(), notification.toString());
+//                }
+                response.getData().put("Notification",userListNotification);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } catch (Exception e) {
                 throw new Exception(e.getMessage() + "\n Get Notification Fail");
